@@ -1,0 +1,19 @@
+server.port: 8080
+spring.profiles.active: local
+server.servlet.context-path: /gateway
+# undertow
+server.undertow.threads.worker: 96
+server.undertow.max-http-post-size: 104857600
+# spring
+spring.servlet.multipart.max-file-size: 100MB
+spring.servlet.multipart.max-request-size: 100MB
+
+spring:
+  application:
+    name: springboot-application-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true

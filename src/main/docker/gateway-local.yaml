@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-service-gateway
+spec:
+  minReadySeconds: 20
+  replicas: 1
+  selector:
+    matchLabels:
+      app: springboot-service-gateway
+  template:
+    metadata:
+      labels:
+        app: springboot-service-gateway
+    spec:
+      imagePullSecrets:
+        - name: aliyun-docker-registry-fngry-secret
+      containers:
+        - name: springboot-service-gateway
+          image: registry.cn-hangzhou.aliyuncs.com/fngry/gateway:latest-local
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /data/logs
+              name: log-storage
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms128m -Xmx128m -Dserver.port=8080 -Dspring.profiles.active=local"
+            - name: SPRING_APPLICATION_JSON
+              valueFrom:
+                configMapKeyRef:
+                  name: spring-config
+                  key: spring-config.json
+          resources:
+            requests:
+              memory: "128Mi"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 5
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - bash
+                  - -c
+                  - "curl http://localhost:8080/actuator/health"
+      volumes:
+        - name: log-storage
+          hostPath:
+            path: /data/logs
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: springboot-service-gateway
+spec:
+  selector:
+    app: springboot-service-gateway
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  type: ClusterIP

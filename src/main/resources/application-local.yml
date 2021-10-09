@@ -1,0 +1,4 @@
+
+#spring.datasource.url: jdbc:mysql://localhost:3306/gateway?useSSL=true&useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useAffectedRows=true
+#spring.datasource.username: root
+#spring.datasource.password: 123456
