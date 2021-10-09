@@ -4,7 +4,7 @@ metadata:
   name: springboot-service-gateway
 spec:
   minReadySeconds: 20
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: springboot-service-gateway
